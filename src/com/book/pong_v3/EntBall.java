@@ -8,6 +8,9 @@ import com.book.simplegameengine_v3.SGWorld;
 
 public class EntBall extends SGEntity 
 {
+	// roll_clockwise
+	public static final int STATE_ROLL_CW = 0x01;
+	
 	private static final float MAX_SPEED = 480.0f;
 	
 	private float 	mCosTable[] = new float[10];
@@ -18,6 +21,8 @@ public class EntBall extends SGEntity
 	public EntBall(SGWorld world, PointF position, PointF dimensions) 
 	{
 		super(world, GameModel.BALL_ID, "ball", position, dimensions);
+		
+		addFlags(STATE_ROLL_CW);
 		
 		float radianFactor = (float) (Math.PI / 180);
 		
@@ -60,8 +65,8 @@ public class EntBall extends SGEntity
 		EntPaddle 	player = model.getPlayer();
 		EntOpponent	opponent = model.getOpponent();
 		RectF 		opponentBB = opponent.getBoundingBox();
-		RectF 		playerBB = player.getBoundingBox();		
-		
+		RectF 		playerBB = player.getBoundingBox();
+						
 		if(model.collisionTest(ballBB, playerBB)) 
 		{
 			collidedPaddle = player;
@@ -96,14 +101,33 @@ public class EntBall extends SGEntity
 			{
 				setPosition(paddleBB.right, ballPositionY);
 				mVelocity.x = mSpeed * mCosTable[sector];
+				player.addFlags(EntPaddle.STATE_HIT);
+				opponent.removeFlags(EntPaddle.STATE_HIT);
+				if(sector <= 4) {
+					removeFlags(EntBall.STATE_ROLL_CW);
+				}
+				else {
+					addFlags(EntBall.STATE_ROLL_CW);
+				}
 			}
-			else
-			{
+			else if(collidedPaddle.getId() == GameModel.OPPONENT_ID) {
 				setPosition(paddleBB.left - ballDimensionX, ballPositionY);
 				mVelocity.x = -(mSpeed * mCosTable[sector]);
+				opponent.addFlags(EntPaddle.STATE_HIT);
+				player.removeFlags(EntPaddle.STATE_HIT);
+				if(sector <= 4) {
+					addFlags(EntBall.STATE_ROLL_CW);
+				}
+				else {
+					removeFlags(EntBall.STATE_ROLL_CW);
+				}
 			}
 			
 			mVelocity.y = -(mSpeed * mSinTable[sector]);
+		}
+		else {
+			opponent.removeFlags(EntPaddle.STATE_HIT);
+			player.removeFlags(EntPaddle.STATE_HIT);
 		}
 	}
 	

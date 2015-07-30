@@ -12,8 +12,18 @@ public class EntPlayer extends EntPaddle
 	}
 	
 	@Override
-	public void step(float elapsedTimeInSeconds) 
-	{
+	public void step(float elapsedTimeInSeconds) {
+		
+		float playerHeight = getBoundingBox().bottom - getBoundingBox().top;
+		float playerCenterY = getPosition().y + (playerHeight / 2);
+		EntBall ball = ((GameModel)getWorld()).getBall();
+		float ballCenterY = (ball.getPosition().y + ball.getDimensions().y / 2);
+		if(playerCenterY > ballCenterY) {
+			addFlags(EntPaddle.STATE_LOOKING_UP);
+		}
+		else {
+			removeFlags(EntPaddle.STATE_LOOKING_UP);
+		}
 	}
 }
 

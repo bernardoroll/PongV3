@@ -57,6 +57,17 @@ public class EntOpponent extends EntPaddle
 		{
 			move(0, mSpeed * elapsedTimeInSeconds);
 		}
+		
+		float opponentHeight = getBoundingBox().bottom - getBoundingBox().top;
+		float opponentCenterY = (getPosition().y + (opponentHeight / 2));
+		if(opponentCenterY > ballCenterY) {
+			addFlags(EntPaddle.STATE_LOOKING_UP);
+		}
+		else {
+			removeFlags(EntPaddle.STATE_LOOKING_UP);
+		}
+		
+		
 	}
 	
 	public float getReaction() { return mReaction; }

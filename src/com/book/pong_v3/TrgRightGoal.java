@@ -17,17 +17,28 @@ public class TrgRightGoal extends SGTrigger
 	@Override
 	public void onHit(SGEntity entity, float elapsedTimeInSeconds) 
 	{
-		GameModel model = (GameModel)getWorld();
-		model.increasePlayerScore();
-		
-		EntOpponent opponent = model.getOpponent();
-		opponent.calculateSpeed(model.getPlayerScore());
-		opponent.decreaseReaction();
-		
-		Log.d("PongV2", "Jogador marca um ponto!");
-		model.logScore();
-		
-		model.resetWorld();
-		model.getRestartTimer().start();
+		if(isActive()) {
+			GameModel model = (GameModel)getWorld();
+			model.increasePlayerScore();
+
+			EntOpponent opponent = model.getOpponent();
+			opponent.calculateSpeed(model.getPlayerScore());
+			opponent.decreaseReaction();
+
+			Log.d("PongV2", "Jogador marca um ponto!");
+			model.logScore();
+			
+			if(model.getPlayerScore() == 10) {
+				model.getOpponent().addFlags(EntPaddle.STATE_CONCERNED);
+				model.getOpponent().removeFlags(EntPaddle.STATE_HAPPY);
+			}
+			else if(model.getPlayerScore() == 20) {
+				model.getOpponent().addFlags(EntPaddle.STATE_ANGRY);
+				model.getOpponent().removeFlags(EntPaddle.STATE_CONCERNED);
+			}	
+
+			model.resetWorld();
+			model.getRestartTimer().start();
+		}
 	}
 }
