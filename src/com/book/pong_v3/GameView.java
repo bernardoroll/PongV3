@@ -2,25 +2,32 @@ package com.book.pong_v3;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Rect;
-
 import com.book.simplegameengine_v3.SGEntity;
 import com.book.simplegameengine_v3.SGImage;
 import com.book.simplegameengine_v3.SGImageFactory;
 import com.book.simplegameengine_v3.SGRenderer;
+import com.book.simplegameengine_v3.SGTileset;
 import com.book.simplegameengine_v3.SGView;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.PointF;
+import android.graphics.Rect;
 
 public class GameView extends SGView {
 	private boolean mIsDebug = false;
 	private GameModel mModel;
 	private Rect mTempSrcRect = new Rect();
 	
-	private SGImage mBallImage;
-	private SGImage mOpponentImage;
-	private SGImage mPlayerImage;
+//	private SGImage mBallImage;
+//	private SGImage mOpponentImage;
+//	private SGImage mPlayerImage;
+	
+	private SGTileset mTsetBall;
+	private SGTileset mTsetOpponent;
+	private SGTileset mTsetPlayer;
 	
 	private GameView(Context context) 
 	{
@@ -40,9 +47,19 @@ public class GameView extends SGView {
 		
 		SGImageFactory imageFactory = getImageFactory();
 		
-		mBallImage = imageFactory.createImage("ball.png");
-		mPlayerImage = imageFactory.createImage("player.png");
-		mOpponentImage = imageFactory.createImage("opponent.png");
+		// Ball
+		SGImage ballImage = imageFactory.createImage("ball.png");
+		mTsetBall = new SGTileset(ballImage,  new Point(4,2), null);
+		
+		// Paddle do oponente
+		SGImage opponentImage = imageFactory.createImage("opponent.png");
+		mTsetOpponent = new SGTileset(opponentImage, new Point (8,2), new Rect(0, 0,
+				GameModel.PADDLE_WIDTH, GameModel.PADDLE_HEIGHT));
+		
+		// Paddle jogador
+		SGImage playerImage = imageFactory.createImage("player.png");
+		mTsetPlayer = new SGTileset(playerImage, new Point(8, 2), new Rect(0, 0, 
+				GameModel.PADDLE_WIDTH, GameModel.PADDLE_HEIGHT));
 	}
 	
 	@Override 
@@ -54,15 +71,12 @@ public class GameView extends SGView {
 		renderer.beginDrawing(canvas, Color.BLACK);
 		
 		ArrayList<SGEntity> entities = mModel.getEntities();
-		SGEntity currentEntity;
+		
 		
 		if(mIsDebug == true)
-		{
-			int arraySize = entities.size();		
-			for(int i = 0; i < arraySize; i++) 
-			{
-				currentEntity = entities.get(i);
-				
+		{		
+			for(SGEntity currentEntity : entities) 
+			{				
 				SGEntity.DebugDrawingStyle style = currentEntity.getDebugDrawingStyle();
 				if(style == SGEntity.DebugDrawingStyle.FILLED) 
 				{
@@ -74,34 +88,26 @@ public class GameView extends SGView {
 				}
 			}
 		}
-		else
-		{
-			int arraySize = entities.size();		
-			for(int i = 0; i < arraySize; i++) 
-			{
-				currentEntity = entities.get(i);
-				
-				if(currentEntity.getCategory() != "trigger")
-				{
-					if(currentEntity.getId() == GameModel.PLAYER_ID)
-					{
-						mTempSrcRect.set(0, 0, GameModel.PADDLE_WIDTH, GameModel.PADDLE_HEIGHT);
-						renderer.drawImage(mPlayerImage, mTempSrcRect, currentEntity.getPosition(), currentEntity.getDimensions());
+		else {
+			for(SGEntity currentEntity : entities) {
+				if(currentEntity.getCategory() != "trigger") {
+					SGTileset tileset;
+					if(currentEntity.getId() == GameModel.PLAYER_ID) {
+						tileset = mTsetPlayer;
 					}
-					else if(currentEntity.getId() == GameModel.OPPONENT_ID)
-					{
-						mTempSrcRect.set(0, 0, GameModel.PADDLE_WIDTH, GameModel.PADDLE_HEIGHT);
-						renderer.drawImage(mOpponentImage, mTempSrcRect, currentEntity.getPosition(), currentEntity.getDimensions());
+					else if(currentEntity.getId() == GameModel.OPPONENT_ID) {
+						tileset = mTsetOpponent;
 					}
-					else // (currentEntity.getId() == GameModel.BALL_ID)
-					{
-						mTempSrcRect.set(0, 0, GameModel.BALL_SIZE, GameModel.BALL_SIZE);
-						renderer.drawImage(mBallImage, mTempSrcRect, currentEntity.getPosition(), currentEntity.getDimensions());
+					else { // Ball
+						tileset = mTsetBall;
 					}
+					PointF position = currentEntity.getPosition();
+					PointF dimensions = currentEntity.getDimensions();
+					Rect drawingArea = tileset.getTile(0);
+					renderer.drawImage(tileset.getImage(), drawingArea,  position,  dimensions);;
 				}
 			}
-		}
-		
+		}		
 		renderer.endDrawing();
 	}
 }
