@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.book.simplegameengine_v3.SGAnimation;
 import com.book.simplegameengine_v3.SGEntity;
 import com.book.simplegameengine_v3.SGImage;
-import com.book.simplegameengine_v3.SGImageFactory;
+//import com.book.simplegameengine_v3.SGImageFactory;
 import com.book.simplegameengine_v3.SGRenderer;
 import com.book.simplegameengine_v3.SGTileset;
 import com.book.simplegameengine_v3.SGView;
@@ -57,7 +57,7 @@ public class GameView extends SGView {
 	{
 		mModel.setup();
 		
-		SGImageFactory imageFactory = getImageFactory();
+		//SGImageFactory imageFactory = getImageFactory();
 		
 		// Ball
 		SGImage ballImage = getImageFactory().createImage("tilesets/ball.png");
